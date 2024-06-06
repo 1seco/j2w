@@ -18,14 +18,13 @@ typedef struct {
   bool end;
 } Tok;
 
-DPair* findCharII(char a, DPair* arr_delim) {
+DPair* findDelimP(char a, DPair* arr_delim) {
   do {
-    if (arr_delim->pair[0] == a){
-      arr_delim++;
+    if (arr_delim->pair[0] == a) {
       return arr_delim;
     }
-  }
-  while(arr_delim->end != true);
+    arr_delim++;
+  } while ((arr_delim - 1)->end != true);
   return NULL;
 }
 
@@ -56,18 +55,15 @@ char* readTill(char** src_line, char end_char) {
 
 Tok nextTok(char** src_line, DPair* src_pair) {
   Tok local_tok;
-  char* check;
-  DPair* var_pair = NULL;
+  DPair* DelmP = NULL;
   while (**src_line == ' ') {
-    src_line++;
-  }
-  if ((var_pair = findCharII(**src_line, src_pair)) != NULL) {
     (*src_line)++;
-    if ((check = readTill(src_line, var_pair->pair[1])) != NULL){
-      local_tok.token = check;
-      local_tok.type = var_pair->tok_type;
-    }
-    local_tok.type = var_pair->tok_type;
+  }
+  if ((DelmP = findDelimP(**src_line, src_pair)) != NULL) {
+    (*src_line)++;
+    local_tok.token = readTill(src_line, DelmP->pair[1]);
+    local_tok.type = DelmP->tok_type;
+    (*src_line)++;
   } else {
     local_tok.token = readTill(src_line, ' ');
     local_tok.type = IDT;
@@ -92,7 +88,6 @@ Tok* tokArr(char* src_line, DPair* src_pair) {
       list = new_list;
     }
     list[offset++] = nextTok(&src_cpy, src_pair);
-    src_cpy++;
   }
   if (offset < bufsize - 1) {
     Tok* new_list = realloc(list, offset * tok_size);
@@ -105,18 +100,14 @@ Tok* tokArr(char* src_line, DPair* src_pair) {
 }
 
 int main(void) {
-  char* src = "This is outside, \"this is inside\", and back outside";
-  DPair them_pairs[] = {
-    {
-    .pair = {'\"', '\"'},
-    .tok_type = LIT,
-    .end = true
-    }
-  };
+  char* src = "This is, \"in a thing\", and out";
+  DPair them_pairs[] = {{.pair = {'\"', '\"'}, .tok_type = LIT, .end = true}};
   Tok* final = NULL;
+  unsigned long finalInd = 0;
   final = tokArr(src, them_pairs);
-  for (unsigned index = 0; final[index].end != true; index++) {
-    printf("%d( %s )\n", final[index].type, final[index].token);
-  }
+  do {
+    printf("%d:(\"%s\"), ", final[finalInd].type, final[finalInd].token);
+    finalInd++;
+  } while (final[finalInd - 1].end != true);
   return 0;
 }
