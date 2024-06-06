@@ -1,9 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#define ERROR_CHAR '\0'
-
+/* removed useless def here*/
 typedef enum { LIT, IDT } TType;
 
 typedef struct {
@@ -31,11 +29,14 @@ DPair* findDelimP(char a, DPair* arr_delim) {
 char* readTill(char** src_line, char end_char) {
   size_t bufsize = 1, offset = 0;
   char* buffer = NULL;
+  if (*src_line == NULL)
+    return NULL;
   while (**src_line != '\0' && **src_line != end_char) {
     if (offset == bufsize - 1) {
       bufsize *= 2;
       char* new_buf = realloc(buffer, bufsize);
-      if (new_buf == NULL && !buffer) {
+      if (new_buf == NULL && buffer) {
+        free(buffer);
         return NULL;
       }
       buffer = new_buf;
@@ -82,7 +83,8 @@ Tok* tokArr(char* src_line, DPair* src_pair) {
     if (offset == bufsize - 1) {
       bufsize *= 2;
       Tok* new_list = realloc(list, bufsize * tok_size);
-      if (new_list == NULL && !list) {
+      if (new_list == NULL && list) {
+        free(list);
         return NULL;
       }
       list = new_list;
@@ -99,6 +101,14 @@ Tok* tokArr(char* src_line, DPair* src_pair) {
   return list;
 }
 
+void deInit(Tok* array) {
+  unsigned long index = 0;
+  do {
+    free(array[index++].token);
+  } while (array[index - 1].end != true);
+  free(array);
+}
+
 int main(void) {
   char* src = "This is, \"in a thing\", and out";
   DPair them_pairs[] = {{.pair = {'\"', '\"'}, .tok_type = LIT, .end = true}};
@@ -109,5 +119,6 @@ int main(void) {
     printf("%d:(\"%s\"), ", final[finalInd].type, final[finalInd].token);
     finalInd++;
   } while (final[finalInd - 1].end != true);
+  deInit(final);
   return 0;
 }
