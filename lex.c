@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 /* removed useless def here*/
-typedef enum { LIT, IDT } TType;
+typedef enum { LIT, IDT, DATE } TType;
 
 typedef struct {
   char pair[2];
@@ -105,20 +105,6 @@ void deInit(Tok* array) {
   unsigned long index = 0;
   do {
     free(array[index++].token);
-  } while (array[index - 1].end != true);
+  } while (array[index - 1].end != true)
   free(array);
-}
-
-int main(void) {
-  char* src = "This is, \"in a thing\", and out";
-  DPair them_pairs[] = {{.pair = {'\"', '\"'}, .tok_type = LIT, .end = true}};
-  Tok* final = NULL;
-  unsigned long finalInd = 0;
-  final = tokArr(src, them_pairs);
-  do {
-    printf("%d:(\"%s\"), ", final[finalInd].type, final[finalInd].token);
-    finalInd++;
-  } while (final[finalInd - 1].end != true);
-  deInit(final);
-  return 0;
 }
