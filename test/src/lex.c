@@ -1,21 +1,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 /* removed useless def here*/
-typedef enum { LIT, IDT } TType;
-
-typedef struct {
-  char pair[2];
-  TType tok_type;
-  bool end;
-} DPair;
-
-typedef struct {
-  TType type;
-  char* token;
-  bool end;
-} Tok;
-
 DPair* findDelimP(char a, DPair* arr_delim) {
   do {
     if (arr_delim->pair[0] == a) {
@@ -105,6 +92,6 @@ void deInit(Tok* array) {
   unsigned long index = 0;
   do {
     free(array[index++].token);
-  } while (array[index - 1].end != true)
+  } while (array[index - 1].end != true);
   free(array);
 }
