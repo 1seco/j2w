@@ -64,9 +64,7 @@ Date convertStuff(char* src, char* format) {
   if (verifyRepeatString(src) != 0){
     printf("error conv.c line 63");
     exit(EXIT_FAILURE);
-  }
-  end_res = stringSplit(&src, splitters);
-  
+  } 
   temp.tm_year -= 1900;
   if (valiDate(temp) == false) {
     return (Date){};
@@ -76,5 +74,5 @@ Date convertStuff(char* src, char* format) {
 
 int main(void) {
   char* format_str = "dmy";
-  char* stonkle = "4/7/5^8:00";
+  char* string = "4/7/5^8:00";
 }
