@@ -1,32 +1,80 @@
-#include "lex.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
-
-typedef enum {
-  sched,
-  event,
-  todo
-} TaskType
+#include <regex.h>
+typedef struct tm Date;
 
 typedef struct {
-  TaskType task_type;
-  struct tm start_dt;
-  struct tm end_dt;
-  char* title;
-  char* tag;
-} UniversalType;
+  Date* array;
+  
+  size_t len;
+} DateArray;
 
-schedSet()
+time_t* current = NULL;
+Date* current_local = NULL;
 
-int switchARooOrSmnthIdk(Tok* line) {
-  if (strcmp(line->token, "sched")) {
+regex_t regex;
+const char *format = "^([0-9]{2}|%)/[0-9]{2}/[0-9]{4}-([0-9]{2}|%)[:][0-9]{2}$";
 
-  } else if (strcmp(line->token, "event")) {
+int compileRegex() {
+  int result = regcomp(&regex, format, REG_EXTENDED);
+  return result;
+}
 
-  } else if (strcmp(line->token), "todo") {
+int verifyRepeatString(const char* src) {
+  return regexec(&regex, src, 0, NULL, 0);
+}
+
+void initTime(void) {
+  *current = time(NULL);
+  current_local = localtime(current);
+  compileRegex();
+}
+
+bool isLeap(int year) {
+  return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
+}
+
+bool valiDate(Date in) {
+  if (in.tm_year > current_local->tm_year + 500 ||
+      in.tm_year < current_local->tm_year - 500) {
+    return false;
   }
-  return 1;
+  if (in.tm_mon < 0 || in.tm_mon > 12)
+    return false;
+  if (in.tm_mday < 0 || in.tm_mday > 31)
+    return false;
+  if (in.tm_mon == 2) {
+    if (isLeap(in.tm_year + 1900))
+      return (in.tm_mday <= 29);
+    else
+      return (in.tm_mday <= 28);
+  }
+  if ( in.tm_mon == 4 || in.tm_mon == 6 || 
+        in.tm_mon == 9 || in.tm_mon == 11) 
+        return (in.tm_mday <= 30);
+  return true;
+}
+
+Date convertStuff(char* src, char* format) {
+  Date temp = {};
+  char* splitters = "/^:";
+  char* end_res = NULL;
+  if (verifyRepeatString(src) != 0){
+    printf("error conv.c line 63");
+    exit(EXIT_FAILURE);
+  }
+  end_res = stringSplit(&src, splitters);
+  
+  temp.tm_year -= 1900;
+  if (valiDate(temp) == false) {
+    return (Date){};
+  }
+  return temp;
+}
+
+int main(void) {
+  char* format_str = "dmy";
+  char* stonkle = "4/7/5^8:00";
 }

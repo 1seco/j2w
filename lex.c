@@ -1,21 +1,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 /* removed useless def here*/
-typedef enum { LIT, IDT } TType;
-
-typedef struct {
-  char pair[2];
-  TType tok_type;
-  bool end;
-} DPair;
-
-typedef struct {
-  TType type;
-  char* token;
-  bool end;
-} Tok;
-
 DPair* findDelimP(char a, DPair* arr_delim) {
   do {
     if (arr_delim->pair[0] == a) {
@@ -72,14 +59,13 @@ Tok nextTok(char** src_line, DPair* src_pair) {
   return local_tok;
 }
 
-Tok* tokArr(char* src_line, DPair* src_pair) {
+Tok* tokArr(char* src_str, DPair* src_pair) {
   Tok* list = NULL;
-  char* src_cpy = src_line;
   size_t tok_size = sizeof(Tok), bufsize = 1, offset = 0;
-  if (src_cpy == NULL) {
+  if (src_str == NULL) {
     return NULL;
   }
-  while (*src_cpy != '\0') {
+  while (*src_str != '\0') {
     if (offset == bufsize - 1) {
       bufsize *= 2;
       Tok* new_list = realloc(list, bufsize * tok_size);
@@ -89,7 +75,7 @@ Tok* tokArr(char* src_line, DPair* src_pair) {
       }
       list = new_list;
     }
-    list[offset++] = nextTok(&src_cpy, src_pair);
+    list[offset++] = nextTok(&src_str, src_pair);
   }
   if (offset < bufsize - 1) {
     Tok* new_list = realloc(list, offset * tok_size);
@@ -105,6 +91,6 @@ void deInit(Tok* array) {
   unsigned long index = 0;
   do {
     free(array[index++].token);
-  } while (array[index - 1].end != true)
+  } while (array[index - 1].end != true);
   free(array);
 }
