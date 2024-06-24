@@ -21,5 +21,6 @@ typedef struct {
   bool end;
 } Tok;
 
-void* arrayInator(void* pointer, size_t memsize, size_t newsize);
+char* readTill(char** src_string, char* end_char);
+char** splitStr(char* src, char* dividers);
 #endif

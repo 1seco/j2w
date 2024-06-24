@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <regex.h>
+#include "common.h"
+
 typedef struct tm Date;
 
 typedef struct {
   Date* array;
-  
   size_t len;
 } DateArray;
 
@@ -57,17 +58,19 @@ bool valiDate(Date in) {
   return true;
 }
 
-Date convertStuff(char* src, char* format) {
+Date convMain(char* src, char* format) {
   Date temp = {};
   char* splitters = "/^:";
   char* end_res = NULL;
   if (verifyRepeatString(src) != 0){
     printf("error conv.c line 63");
     exit(EXIT_FAILURE);
-  } 
+  }
   temp.tm_year -= 1900;
   if (valiDate(temp) == false) {
     return (Date){};
   }
   return temp;
 }
+
+

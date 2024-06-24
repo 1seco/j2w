@@ -13,34 +13,6 @@ DPair* findDelimP(char a, DPair* arr_delim) {
   return NULL;
 }
 
-char* readTill(char** src_line, char end_char) {
-  size_t bufsize = 1, offset = 0;
-  char* buffer = NULL;
-  if (*src_line == NULL)
-    return NULL;
-  while (**src_line != '\0' && **src_line != end_char) {
-    if (offset == bufsize - 1) {
-      bufsize *= 2;
-      char* new_buf = realloc(buffer, bufsize);
-      if (new_buf == NULL && buffer) {
-        free(buffer);
-        return NULL;
-      }
-      buffer = new_buf;
-    }
-    buffer[offset++] = **src_line;
-    (*src_line)++;
-  }
-  if (offset < bufsize - 1) {
-    char* new_buf = realloc(buffer, offset + 1);
-    if (new_buf != NULL) {
-      buffer = new_buf;
-    }
-  }
-  buffer[offset] = '\0';
-  return buffer;
-}
-
 Tok nextTok(char** src_line, DPair* src_pair) {
   Tok local_tok;
   DPair* DelmP = NULL;
