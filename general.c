@@ -12,16 +12,23 @@ bool isIn(char src, char* split) {
 }
 
 char* readTill(char** src, char* split) {
-  unsigned short offset = 0;
-  char* buf = malloc(5);
-  if (!buf)
+  size_t offset = 0, bufsize = 1;
+  char* buf = NULL;
+  if (!src)
     return NULL;
-  while (offset < 4) {
-    if (**src == '\0' || isIn(**src, split) == true)
-      break;
+  while (**src != '\0' && isIn(**src, split) == false) {
+    if (offset == bufsize - 1) {
+      bufsize *= 2;
+      char* new_buf = realloc(buf, bufsize);
+      if (!new_buf) {
+        free(buf);
+        return NULL;
+      }
+      buf = new_buf;
+    }
     buf[offset++] = *((*src)++);
   }
-  if (offset < 4) {
+  if (offset < bufsize - 1) {
     char* new_buf = realloc(buf, offset + 1);
     if (!new_buf)
       buf = new_buf;
@@ -31,25 +38,38 @@ char* readTill(char** src, char* split) {
 }
 
 char** splitStr(char* src, char* split) {
-  char** final = calloc(5, sizeof(void*));
-  for (unsigned index = 0; index < 5; index++) {
-    char* temp = readTill(&src, split);
-    if (temp == NULL)
-      break;
-    final[index] = temp;
-    if (*src != '\0')
-      src++;
-  }
-  if (final[0] == NULL)
+  size_t offset = 0, bufsize = 1;
+  char** final = NULL;
+  if (!src)
     return NULL;
+  while (*src == ' ')
+    src++;
+  while (*src != '\0') {
+    if (offset == bufsize - 1) {
+      bufsize *= 2;
+      char** new_buf = realloc(final, bufsize);
+      if (!new_buf) {
+        free(final);
+        return NULL;
+      }
+      final = new_buf;
+    }
+    final[offset++] = readTill(&src, split);
+  }
+  if (offset == bufsize - 1) {
+    char** new_buf = realloc(final, offset + 1);
+    if (new_buf)
+      final = new_buf;
+  }
+  final[offset] = NULL;
   return final;
 }
 
-int deInit(char** src) {
+void deInit(char** src) {
   size_t index = 0;
-  if (!src) return 1;
-  while(src[index] != NULL) {
-    free(src[index++]);
+  if (src) {
+    while (src[index] != NULL) {
+      free(src[index++]);
+    }
   }
-  return 0;
 }
