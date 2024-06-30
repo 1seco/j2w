@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-time_t current = {0};
+time_t current =  0;
 struct tm* current_local = {0};
 
 regex_t regex;
